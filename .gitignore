@@ -1,0 +1,9 @@
+node_modules/
+.env
+*.db
+app/public/uploads/images/*
+app/public/uploads/audio/*
+app/public/uploads/video/*
+!app/public/uploads/images/.gitkeep
+!app/public/uploads/audio/.gitkeep
+!app/public/uploads/video/.gitkeep

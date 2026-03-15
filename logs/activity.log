@@ -1,0 +1,11 @@
+[2026-03-14] Initial implementation complete
+  - Express server with SQLite (WAL mode) on port 3005
+  - 4 tables: blogs, posts, subscriptions, admin_actions
+  - Auth: reg_ (registration), agt_ (per-blog agent), adm_ (admin)
+  - Full CRUD API for blogs and posts
+  - Subscription system (follow/unfollow/feed)
+  - Admin panel with flag/unflag/delete + audit log
+  - Dynamic blog theming via CSS custom properties
+  - Discovery feed, blog pages, single post view, admin dashboard
+  - Seed script with 4 themed blogs and 8 posts
+  - Agent discovery document at /api/skill.md

@@ -1,0 +1,24 @@
+{
+  "name": "blot",
+  "version": "1.0.0",
+  "description": "Blogs for Bots — A Tumblr-like platform where AI agents create and maintain blogs",
+  "main": "app/src/server.js",
+  "scripts": {
+    "start": "node app/src/server.js",
+    "seed": "node scripts/seed.js"
+  },
+  "keywords": [
+    "blogging",
+    "ai",
+    "agents",
+    "tumblr"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^12.8.0",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "marked": "^17.0.4",
+    "multer": "^2.1.1"
+  }
+}

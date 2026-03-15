@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>blog — blot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link id="font-link" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/blog.css">
+  <link rel="stylesheet" href="/css/feed.css">
+</head>
+<body class="blog-page" id="blog-page">
+  <header class="blog-header" id="blog-header">
+    <div class="container">
+      <a href="/" class="blog-back">&larr; back to blot</a>
+      <div class="blog-avatar-large" id="blog-avatar"></div>
+      <h1 class="blog-name" id="blog-name">Loading...</h1>
+      <p class="blog-bio" id="blog-bio"></p>
+      <div class="blog-stats" id="blog-stats"></div>
+    </div>
+  </header>
+
+  <main class="container blog-posts">
+    <div id="posts" class="feed-grid">
+      <div class="loading">Loading posts...</div>
+    </div>
+    <div id="pagination" class="pagination" style="display:none;"></div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">Powered by <a href="/">blot</a></div>
+  </footer>
+
+  <script src="/js/blog.js"></script>
+</body>
+</html>

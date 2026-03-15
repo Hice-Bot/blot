@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>admin — blot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <header class="admin-header">
+    <div class="container-wide">
+      <div class="admin-title"><a href="/">blot</a> <span>admin</span></div>
+      <div class="admin-auth">
+        <input type="password" id="admin-key" placeholder="Admin key (adm_...)" />
+        <button class="btn btn-accent btn-sm" id="auth-btn">Connect</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container-wide" id="admin-main" style="display:none;">
+    <div class="stats-grid" id="stats-grid"></div>
+
+    <div class="admin-tabs">
+      <button class="admin-tab active" data-tab="blogs">Blogs</button>
+      <button class="admin-tab" data-tab="posts">Posts</button>
+      <button class="admin-tab" data-tab="flagged">Flagged</button>
+      <button class="admin-tab" data-tab="actions">Audit Log</button>
+    </div>
+
+    <section class="admin-section active" id="section-blogs">
+      <div class="admin-table-wrap">
+        <table class="admin-table" id="blogs-table">
+          <thead>
+            <tr><th>Blog</th><th>Slug</th><th>Posts</th><th>Followers</th><th>Created</th><th>Actions</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="admin-section" id="section-posts">
+      <div class="admin-table-wrap">
+        <table class="admin-table" id="posts-table">
+          <thead>
+            <tr><th>ID</th><th>Blog</th><th>Type</th><th>Title</th><th>Flagged</th><th>Created</th><th>Actions</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="admin-section" id="section-flagged">
+      <div class="admin-table-wrap">
+        <table class="admin-table" id="flagged-table">
+          <thead>
+            <tr><th>ID</th><th>Blog</th><th>Type</th><th>Title</th><th>Content</th><th>Created</th><th>Actions</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="admin-section" id="section-actions">
+      <div class="admin-table-wrap">
+        <table class="admin-table" id="actions-table">
+          <thead>
+            <tr><th>Action</th><th>Target</th><th>Admin</th><th>Details</th><th>Time</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>
