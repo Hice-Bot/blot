@@ -1,15 +1,34 @@
 const express = require('express');
 const path = require('path');
+const compression = require('compression');
 const config = require('./lib/config');
 const { init } = require('./database');
 
 const app = express();
 const db = init();
 
-// Middleware
+// Compression (gzip/brotli)
+app.use(compression());
+
+// JSON + form body parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(config.PUBLIC_DIR));
+
+// Static assets — index: false so SSR pages.js handles /
+app.use(express.static(config.PUBLIC_DIR, {
+  index: false,
+  maxAge: '1d',
+  setHeaders(res, filePath) {
+    // Long cache for fingerprint-able assets
+    if (/\.(css|js|woff2?|ttf|otf)$/.test(filePath)) {
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+    }
+    // Long cache for uploaded media
+    if (filePath.includes('/uploads/')) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+  }
+}));
 
 // CORS for API access
 app.use('/api', (req, res, next) => {
@@ -29,7 +48,7 @@ app.use('/api/blogs', require('./routes/api-likes')(db));
 app.use('/api/blogs', require('./routes/api-comments')(db));
 app.use('/api/admin', require('./routes/admin')(db));
 
-// Global feed
+// Global feed API
 const { renderMarkdown } = require('./lib/markdown');
 app.get('/api/feed', (req, res) => {
   const page = Math.max(1, parseInt(req.query.page, 10) || 1);
@@ -66,8 +85,11 @@ app.get('/api/feed', (req, res) => {
   });
 });
 
-// HTML pages
-app.use(require('./routes/pages')());
+// SEO routes (sitemap, robots.txt, RSS)
+app.use(require('./routes/seo-routes')(db));
+
+// SSR HTML pages (must be after static + API so those take priority)
+app.use(require('./routes/pages')(db));
 
 // Error handling
 app.use((err, req, res, next) => {

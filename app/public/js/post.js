@@ -1,0 +1,136 @@
+(function () {
+  'use strict';
+
+  var parts = window.location.pathname.split('/');
+  var slug = parts[2];
+  var postId = parts[4];
+  if (!slug || !postId) { window.location.href = '/'; return; }
+
+  var pageEl = document.getElementById('blog-page');
+  var contentEl = document.getElementById('post-content');
+  var likesEl = document.getElementById('likes-section');
+  var commentsEl = document.getElementById('comments-section');
+  var backLink = document.getElementById('back-link');
+  backLink.href = '/blog/' + slug;
+
+  async function load() {
+    try {
+      var blogRes = await fetch('/api/blogs/' + slug);
+      if (blogRes.ok) {
+        var blog = await blogRes.json();
+        applyTheme(blog.theme);
+        backLink.textContent = '\u2190 back to ' + blog.name;
+      }
+
+      var postRes = await fetch('/api/blogs/' + slug + '/posts/' + postId);
+      if (!postRes.ok) { contentEl.innerHTML = '<div class="empty-state">Post not found.</div>'; return; }
+      var post = await postRes.json();
+
+      document.title = (post.title || 'Post') + ' \u2014 blot';
+
+      var mediaHtml = renderMedia(post);
+      var tagsHtml = post.tags.length
+        ? '<div class="blog-post-tags" style="margin-top:1.5rem">' + post.tags.map(function(t) { return '<span class="tag">#' + esc(t) + '</span>'; }).join('') + '</div>'
+        : '';
+
+      contentEl.innerHTML =
+        '<div class="single-post-header">' +
+          (post.title ? '<h1 class="single-post-title">' + esc(post.title) + '</h1>' : '') +
+          '<div class="single-post-meta">' + new Date(post.created_at + 'Z').toLocaleString() +
+          (post.type !== 'text' ? ' &middot; ' + esc(post.type) : '') +
+          '</div>' +
+        '</div>' +
+        mediaHtml +
+        '<div class="single-post-body markdown-content">' + (post.content_html || '').replace(/^<h[12][^>]*>.*?<\/h[12]>\n?/, '') + '</div>' +
+        tagsHtml;
+
+      renderLikes(post);
+      loadComments();
+    } catch (err) {
+      contentEl.innerHTML = '<div class="empty-state">Failed to load post.</div>';
+    }
+  }
+
+  function renderLikes(post) {
+    if (!post.like_count) { likesEl.innerHTML = ''; return; }
+    var links = (post.liked_by || []).map(function(b) {
+      var label = (b.avatar_emoji || '') + ' ' + esc(b.name);
+      return '<a href="/blog/' + esc(b.slug) + '">' + label.trim() + '</a>';
+    });
+    likesEl.innerHTML = '<div class="post-actions" style="margin-top:1.5rem">' +
+      '<span class="post-action">&#x2764; ' + post.like_count +
+      ' <span class="liked-by-list">by ' + links.join(', ') + '</span></span></div>';
+  }
+
+  async function loadComments() {
+    try {
+      var res = await fetch('/api/blogs/' + slug + '/posts/' + postId + '/comments');
+      var data = await res.json();
+      if (data.comments.length === 0) {
+        commentsEl.innerHTML = '';
+        return;
+      }
+      commentsEl.innerHTML = '<div class="comments-section">' +
+        '<div class="comments-header">' + data.comment_count + ' comment' + (data.comment_count !== 1 ? 's' : '') + '</div>' +
+        data.comments.map(renderComment).join('') +
+        '</div>';
+    } catch(e) {}
+  }
+
+  function renderComment(c) {
+    var avatar = c.blog_emoji || c.blog_avatar || '';
+    var repliesHtml = '';
+    if (c.replies && c.replies.length > 0) {
+      repliesHtml = '<div class="comment-replies">' + c.replies.map(renderComment).join('') + '</div>';
+    }
+    return '<div class="comment">' +
+      '<div class="comment-header">' +
+        '<span class="comment-avatar">' + avatar + '</span>' +
+        '<a class="comment-author" href="/blog/' + esc(c.blog_slug) + '">' + esc(c.blog_name) + '</a>' +
+        '<span class="comment-date">' + timeAgo(c.created_at) + '</span>' +
+      '</div>' +
+      '<div class="comment-body markdown-content">' + (c.content_html || esc(c.content)) + '</div>' +
+      repliesHtml +
+      '</div>';
+  }
+
+  function renderMedia(post) {
+    if (!post.media_url) return '';
+    if (post.type === 'image') return '<div class="single-post-media"><img src="' + esc(post.media_url) + '" alt="' + esc(post.title) + '"></div>';
+    if (post.type === 'audio') return '<div class="single-post-media"><audio controls src="' + esc(post.media_url) + '"></audio></div>';
+    if (post.type === 'video') return '<div class="single-post-media"><video controls src="' + esc(post.media_url) + '"></video></div>';
+    return '';
+  }
+
+  function applyTheme(theme) {
+    if (!theme) return;
+    var map = { bg: '--blog-bg', text: '--blog-text', accent: '--blog-accent', secondary: '--blog-secondary', border: '--blog-border', link: '--blog-link', card_bg: '--blog-card-bg' };
+    for (var key in map) {
+      if (theme[key]) pageEl.style.setProperty(map[key], theme[key]);
+    }
+    if (theme.font) {
+      pageEl.style.setProperty('--blog-font', "'" + theme.font + "', monospace");
+      document.getElementById('font-link').href = 'https://fonts.googleapis.com/css2?family=' + theme.font.replace(/ /g, '+') + ':wght@400;500;600;700&display=swap';
+    }
+  }
+
+  function timeAgo(dateStr) {
+    var now = Date.now();
+    var then = new Date(dateStr + 'Z').getTime();
+    var diff = Math.floor((now - then) / 1000);
+    if (diff < 60) return 'just now';
+    if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+    if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+    return new Date(dateStr + 'Z').toLocaleDateString();
+  }
+
+  function esc(str) {
+    if (!str) return '';
+    var d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  load();
+})();

@@ -70,7 +70,7 @@
             '</div>' +
           '</div>' +
           mediaHtml +
-          '<div class="single-post-body markdown-content">' + (post.content_html || '') + '</div>' +
+          '<div class="single-post-body markdown-content">' + (post.content_html || '').replace(/^<h[12][^>]*>.*?<\/h[12]>\n?/, '') + '</div>' +
           tagsHtml;
 
         // Render likes

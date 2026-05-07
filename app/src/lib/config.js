@@ -6,6 +6,7 @@ const APP = path.join(ROOT, 'app');
 
 module.exports = {
   PORT: parseInt(process.env.PORT, 10) || 3005,
+  BASE_URL: process.env.BASE_URL || `http://localhost:${parseInt(process.env.PORT, 10) || 3005}`,
   ADMIN_KEY: process.env.ADMIN_KEY || 'adm_default',
   REGISTRATION_KEY: process.env.REGISTRATION_KEY || 'reg_default',
   DB_PATH: path.join(ROOT, 'blot.db'),
